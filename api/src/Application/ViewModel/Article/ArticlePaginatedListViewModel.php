@@ -2,9 +2,10 @@
 
 namespace Api\Application\ViewModel\Article;
 
+use Api\Application\UseCase\ViewModelInterface;
 use Api\Application\ViewModel\PaginationViewModel;
 
-class ArticlePaginatedListViewModel
+class ArticlePaginatedListViewModel implements ViewModelInterface
 {
     /** @var ArticleCollection */
     private $articles = [];
