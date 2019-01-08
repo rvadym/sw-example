@@ -2,7 +2,7 @@
 
 namespace Api\Application\Query;
 
-use Api\Application\UseCase\CommandQueryInterface;
+use Sw\Application\CommandQueryInterface;
 
 class PaginatedListQuery implements CommandQueryInterface
 {

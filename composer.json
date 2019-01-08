@@ -14,7 +14,8 @@
     }
   },
   "require": {
-    "php": ">=7.2"
+    "php": ">=7.2",
+    "gears/class-finder": "^1.0"
   },
   "config": {
     "bin-dir": "bin",

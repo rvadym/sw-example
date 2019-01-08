@@ -2,8 +2,8 @@
 
 namespace Api\Application\ViewModel\Article;
 
-use Api\Application\UseCase\ViewModelInterface;
 use Api\Application\ViewModel\PaginationViewModel;
+use Sw\Application\ViewModelInterface;
 
 class ArticlePaginatedListViewModel implements ViewModelInterface
 {

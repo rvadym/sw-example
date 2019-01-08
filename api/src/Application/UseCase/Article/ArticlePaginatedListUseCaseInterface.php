@@ -3,8 +3,8 @@
 namespace Api\Application\UseCase\Article;
 
 use Api\Application\Query\Article\ArticlePaginatedListQuery;
-use Api\Application\UseCase\UseCaseInterface;
 use Api\Application\ViewModel\Article\ArticlePaginatedListViewModel;
+use Sw\Application\UseCaseInterface;
 
 interface ArticlePaginatedListUseCaseInterface extends UseCaseInterface
 {

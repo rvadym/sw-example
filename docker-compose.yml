@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+    sw_php:
+        build:
+            context: .
+            target: develop
+        container_name: sw_php
+        environment:
+            - PHP_IDE_CONFIG=serverName=remote
+        volumes:
+            - ./:/app
+            - ./docker/php-fpm/php-ini-overrides.ini:/etc/php7/conf.d/99-overrides.ini
+        tty: true
+        working_dir: /app
+        entrypoint: tail -f /dev/null
