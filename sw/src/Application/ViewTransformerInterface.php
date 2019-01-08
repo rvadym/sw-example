@@ -2,6 +2,6 @@
 
 namespace Sw\Application;
 
-interface UseCaseInterface
+interface ViewTransformerInterface
 {
 }

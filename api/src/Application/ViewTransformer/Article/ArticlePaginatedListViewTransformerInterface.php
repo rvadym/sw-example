@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Api\Application\UseCase\Article;
+namespace Api\Application\ViewTransformer\Article;
 
 use Api\Application\Query\Article\ArticlePaginatedListQuery;
 use Api\Application\ViewModel\Article\ArticlePaginatedListViewModel;
-use Sw\Application\UseCaseInterface;
+use Sw\Application\ViewTransformerInterface;
 
-interface ArticlePaginatedListUseCaseInterface extends UseCaseInterface
+interface ArticlePaginatedListViewTransformerInterface extends ViewTransformerInterface
 {
     /**
      * @param ArticlePaginatedListQuery $commandQuery

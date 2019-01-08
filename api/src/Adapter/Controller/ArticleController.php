@@ -3,19 +3,21 @@
 namespace Api\Adapter\Controller;
 
 use Api\Application\Query\Article\ArticlePaginatedListQuery;
-use Api\Application\UseCase\Article\ArticlePaginatedListUseCaseInterface;
 use Api\Application\ViewModel\Article\ArticlePaginatedListViewModel;
+use Api\Application\ViewTransformer\Article\ArticlePaginatedListViewTransformerInterface;
 use Sw\Adapter\View\ControllerInterface;
 
 class ArticleController implements ControllerInterface
 {
     /**
      * @param ArticlePaginatedListQuery $query
-     * @param ArticlePaginatedListUseCaseInterface $useCase
+     * @param ArticlePaginatedListViewTransformerInterface $viewTransformer
      * @return ArticlePaginatedListViewModel
      */
-    public function list(ArticlePaginatedListQuery $query, ArticlePaginatedListUseCaseInterface $useCase): ArticlePaginatedListViewModel
-    {
-        return $useCase->execute($query);
+    public function list(
+        ArticlePaginatedListQuery $query,
+        ArticlePaginatedListViewTransformerInterface $viewTransformer
+    ) : ArticlePaginatedListViewModel {
+        return $viewTransformer->execute($query);
     }
 }

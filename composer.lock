@@ -4,8 +4,35 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f90977f42966cd8c501f85ac83c62f27",
+    "content-hash": "97fd008e5c4cf3320062a6cee24a0bf6",
     "packages": [
+        {
+            "name": "calcinai/strut",
+            "version": "v0.2.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calcinai/strut.git",
+                "reference": "6cd70c104d5537b71fc55d09c0112de9e25acc7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calcinai/strut/zipball/6cd70c104d5537b71fc55d09c0112de9e25acc7e",
+                "reference": "6cd70c104d5537b71fc55d09c0112de9e25acc7e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Calcinai\\Strut\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Library for creating and manipulating Swagger schemas",
+            "time": "2018-01-15T20:29:15+00:00"
+        },
         {
             "name": "gears/class-finder",
             "version": "v1.0.2",
