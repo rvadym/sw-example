@@ -16,6 +16,7 @@
   "require": {
     "php": ">=7.2",
     "calcinai/strut": "^0.2.5",
+    "doctrine/annotations": "^1.6",
     "gears/class-finder": "^1.0"
   },
   "config": {

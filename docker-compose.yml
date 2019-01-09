@@ -13,3 +13,15 @@ services:
         tty: true
         working_dir: /app
         entrypoint: tail -f /dev/null
+
+    sw_swagger_ui:
+        container_name: sw_swagger_ui
+        image: swaggerapi/swagger-ui
+        environment:
+            - SWAGGER_JSON=/app/swagger.json
+            #- BASE_URL=/swagger # This will serve Swagger UI at /swagger instead of /.
+        volumes:
+            - ./:/app
+        ports:
+            - 8089:8080
+
