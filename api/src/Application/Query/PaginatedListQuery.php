@@ -3,12 +3,32 @@
 namespace Api\Application\Query;
 
 use Sw\Application\CommandQueryInterface;
+use Sw\Util\Annotation\SwCommandQueryAnnotation as SwCommandQuery;
 
 class PaginatedListQuery implements CommandQueryInterface
 {
-    /** @var int */
+    /**
+     * @var int
+     *
+     * @SwCommandQuery(
+     *     description="Page of results.",
+     *     type="integer",
+     *     format="int64",
+     *     required=false,
+     * )
+     */
     private $page = 1;
-    /** @var int */
+
+    /**
+     * @var int
+     *
+     * @SwCommandQuery(
+     *     description="Quantity of results ion page.",
+     *     type="integer",
+     *     format="int64",
+     *     required=false,
+     * )
+     */
     private $limit = 10;
 
     /**

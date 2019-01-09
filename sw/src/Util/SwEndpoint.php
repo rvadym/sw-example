@@ -12,9 +12,16 @@ use Calcinai\Strut\Definitions\Responses;
 use Calcinai\Strut\Definitions\Schema;
 use Calcinai\Strut\Definitions\Schema\Properties\Properties;
 use Exception;
+use ReflectionMethod;
+use ReflectionClass;
 
 class SwEndpoint
 {
+    /* <<< Endpoint configs */
+    /** @var ReflectionClass  */
+    private $reflectionClass;
+    /** @var ReflectionMethod  */
+    private $reflectionMethod;
     /** @var string  */
     private $endpoint;
     /** @var string */
@@ -25,14 +32,29 @@ class SwEndpoint
     private $operationId;
     /** @var string  */
     private $tag;
+    /* Endpoint configs >>> */
+
+    /* <<< Command/Query */
+    /** @var QueryParameterSubSchema[]  */
+    private $queryParameters = [];
+    /* Command/Query >>> */
+
+    /* <<< Response */
+    /** @var Response[]  */
+    private $responses = [];
+    /* Response >>> */
 
     public function __construct(
+        ReflectionClass $reflectionClass,
+        ReflectionMethod $reflectionMethod,
         string $endpoint,
         string $method,
         string $summary,
         string $operationId,
         string $tag
     ) {
+        $this->reflectionClass = $reflectionClass;
+        $this->reflectionMethod = $reflectionMethod;
         $this->endpoint = $endpoint;
         $this->method = $method;
         $this->summary = $summary;
@@ -40,9 +62,44 @@ class SwEndpoint
         $this->tag = $tag;
     }
 
+    /**
+     * @return ReflectionClass
+     */
+    public function getReflectionClass(): ReflectionClass
+    {
+        return $this->reflectionClass;
+    }
+
+    /**
+     * @return ReflectionMethod
+     */
+    public function getReflectionMethod(): ReflectionMethod
+    {
+        return $this->reflectionMethod;
+    }
+
+    /**
+     * @return string
+     */
     public function getEndpoint(): string
     {
         return $this->endpoint;
+    }
+
+    /**
+     * @param QueryParameterSubSchema $queryParameters
+     */
+    public function addParameters(QueryParameterSubSchema $queryParameters): void
+    {
+        $this->queryParameters[] = $queryParameters;
+    }
+
+    /**
+     * @param Response $response
+     */
+    public function addResponse(Response $response): void
+    {
+        $this->responses[] = $response;
     }
 
     /**
@@ -51,48 +108,56 @@ class SwEndpoint
      */
     public function getPathItem(): PathItem
     {
-        return PathItem::create()
-            ->setGet(
-                Operation::create()
-                    ->setSummary($this->summary)
-                    ->setOperationId($this->operationId)
-                    ->addTag($this->tag)
+        $operation = Operation::create();
+        $operation
+            ->setSummary($this->summary)
+            ->setOperationId($this->operationId)
+            ->addTag($this->tag);
 
-                    ->addParameter(
-                        QueryParameterSubSchema::create()
-                            ->setName('Limit')
-                            ->setDescription('How many items to return at one time (max 100)')
-                            ->setRequired(false)
-                            ->setType('integer')
-                            ->setFormat('int64')
+        /** @var QueryParameterSubSchema $queryParameter */
+        foreach ($this->queryParameters as $queryParameter) {
+            $operation->addParameter($queryParameter);
+        }
+
+        $responses = Responses::create();
+
+        /** @var Response $response */
+        foreach ($this->responses as $code => $response) {
+            $responses->set($code, $response);
+        }
+
+        $operation
+            ->setResponses(
+                $responses
+                    ->set(
+                        '200',
+                        Response::create()
+                            ->setDescription('A paged array of pets')
+                            ->setHeaders(
+                                Headers::create()
+                                    ->set('x-next',
+                                        Header::create()
+                                            ->setType('string')
+                                            ->setDescription('A link to the next page of responses')
+                                    )
+                            )
+                            ->setSchema(
+                                $this->getSuccessSchema()
+                            )
                     )
-
-                    ->setResponses(
-                        Responses::create()
-                            ->set(
-                                '200',
-                                Response::create()
-                                    ->setDescription('A paged array of pets')
-                                    ->setHeaders(
-                                        Headers::create()
-                                            ->set('x-next',
-                                                Header::create()
-                                                    ->setType('string')
-                                                    ->setDescription('A link to the next page of responses')
-                                            )
-                                    )
-                                    ->setSchema(
-                                        $this->getSuccessSchema()
-                                    )
-                            )
-                            ->set('default', Response::create()
-                                ->setDescription('Unexpected error')
-                                ->setSchema(
-                                    $this->getErrorSchema()
-                                )
-                            )
+                    ->set('default', Response::create()
+                        ->setDescription('Unexpected error')
+                        ->setSchema(
+                            $this->getErrorSchema()
+                        )
                     )
             );
+
+
+        $pathItem = PathItem::create();
+        $pathItem->setGet($operation);
+
+        return $pathItem;
     }
 
     /**

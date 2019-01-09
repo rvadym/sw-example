@@ -27,7 +27,8 @@ class ControllerMethodEndpointFinder implements EndpointFinderInterface
     /** {@inheritdoc} */
     public function find(SwClass $swClass): array
     {
-        $methods = $swClass->getReflection()->getMethods(ReflectionMethod::IS_PUBLIC);
+        $class = $swClass->getReflection();
+        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
 
         /** @var SwEndpoint[] $swEndpoints */
         $swEndpoints = [];
@@ -37,6 +38,8 @@ class ControllerMethodEndpointFinder implements EndpointFinderInterface
             $endpointAnnotation = $this->getEndpointAnnotation($method);
 
             $swEndpoints[$method->getName()] = new SwEndpoint(
+                $class,
+                $method,
                 $endpointAnnotation->getPath(),
                 $endpointAnnotation->getMethod(),
                 $endpointAnnotation->getSummary(),

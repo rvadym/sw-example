@@ -32,7 +32,7 @@ class SwConfig
     private $apiConsumes;
     /** @var array */
     private $apiProduces;
-    /* >>> Main Swagger configuration */
+    /* Main Swagger configuration >>> */
 
     /**
      * SwConfig constructor.

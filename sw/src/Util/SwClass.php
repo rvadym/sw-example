@@ -2,17 +2,22 @@
 
 namespace Sw\Util;
 
+use Calcinai\Strut\Definitions\QueryParameterSubSchema;
 use Calcinai\Strut\Definitions\Schema;
 use Calcinai\Strut\Definitions\Schema\Properties\Properties;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionMethod;
 use ReflectionException;
+use ReflectionParameter;
 use Exception;
 use Sw\Adapter\View\ActionInterface;
 use Sw\Adapter\View\ControllerInterface;
+use Sw\Application\CommandQueryInterface;
+use Sw\Util\Annotation\SwCommandQueryAnnotation;
 use Sw\Util\EndpointFinder\EndpointFinderInterface;
 use Sw\Util\EndpointFinder\EndpointFinders;
+use Sw\Util\EndpointFinder\QueryFinder;
 
 class SwClass
 {
@@ -22,6 +27,8 @@ class SwClass
     private $type;
     /** @var EndpointFinderInterface  */
     private $endpointFinder;
+    /** @var QueryFinder  */
+    private $queryFinder;
 
     /**
      * SwClass constructor.
@@ -36,6 +43,7 @@ class SwClass
     ) {
         $this->setClassAndType($class);
         $this->setEndpointFinder($endpointFinders);
+        $this->queryFinder = new QueryFinder();
     }
 
     /**
@@ -86,6 +94,23 @@ class SwClass
     }
 
     /**
+     * @param ReflectionMethod $method
+     * @return MethodSignature
+     */
+    protected function getMethodSignature(ReflectionMethod $method): MethodSignature
+    {
+        static $signatures = [];
+
+        if (empty($signatures[$method->getName()])) {
+            $signatures[$method->getName()] = new MethodSignature(
+                $method->getParameters()
+            );
+        }
+
+        return $signatures[$method->getName()];
+    }
+
+    /**
      * @return SwEndpoint[]
      */
     public function getEndpoints(): array
@@ -93,7 +118,77 @@ class SwClass
         /** @var SwEndpoint[] $swEndpoints */
         $swEndpoints = $this->endpointFinder->find($this);
 
+        /** @var SwEndpoint $swEndpoint */
+        foreach ($swEndpoints as $swEndpoint) {
+            $this->addCommandQueryParameters($swEndpoint);
+        }
+
         return $swEndpoints;
+    }
+
+    protected function addCommandQueryParameters(SwEndpoint $swEndpoint): void
+    {
+        /** @var null|ReflectionClass $commandQuery */
+        $commandQuery = $this->getCommandQuery(
+            $this->getMethodSignature(
+                $swEndpoint->getReflectionMethod()
+            )
+        );
+
+        if ($commandQuery) {
+            /** @var ReflectionProperty[] $properties */
+            $properties = $this->getAllProperties($commandQuery);
+
+            /** @var ReflectionProperty $property */
+            foreach ($properties as $property) {
+                /** @var SwCommandQueryAnnotation $annot */
+                $annot = $this->queryFinder->find($property);
+
+                $swEndpoint->addParameters(
+                    QueryParameterSubSchema::create()
+                        ->setName($property->getName())
+                        ->setDescription($annot->getDescription())
+                        ->setRequired($annot->isRequired())
+                        ->setType($annot->getType())
+                        ->setFormat($annot->getFormat())
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ReflectionClass $reflectionClass
+     * @return ReflectionProperty[]
+     */
+    protected function getAllProperties(ReflectionClass $reflectionClass): array
+    {
+        $properties = $reflectionClass->getProperties();
+        $parentClass = $reflectionClass->getParentClass();
+
+        if ($parentClass) {
+            $parentProperties = $this->getAllProperties($parentClass);
+
+            $properties = array_merge($properties, $parentProperties);
+        }
+
+        return $properties;
+    }
+
+    protected function getCommandQuery(MethodSignature $signature): ?ReflectionClass
+    {
+        /** @var ReflectionParameter[] $methodParameters */
+        $methodParameters = $signature->getParameters();
+
+        foreach ($methodParameters as $methodParameter) {
+            /** @var ReflectionClass $parameterClass */
+            $parameterClass = $methodParameter->getClass();
+
+            if ($parameterClass->implementsInterface(CommandQueryInterface::class)) {
+                return $parameterClass;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -154,10 +249,8 @@ class SwClass
             ControllerInterface::class,
         ];
 
-        $interfaces = $this->getReflection()->getInterfaceNames();
-
         foreach ($supportedInterfaces as $supportedInterface) {
-            if (in_array($supportedInterface, $interfaces)) {
+            if ($this->getReflection()->implementsInterface($supportedInterface)) {
                 $isClassSupported++;
             }
         }
