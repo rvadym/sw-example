@@ -23,7 +23,7 @@ class PaginatedListQuery implements CommandQueryInterface
      * @var int
      *
      * @SwCommandQuery(
-     *     description="Quantity of results ion page.",
+     *     description="Quantity of results on page.",
      *     type="integer",
      *     format="int64",
      *     required=false,

@@ -4,12 +4,38 @@ namespace Api\Application\ViewModel\Article;
 
 use Api\Application\ViewModel\PaginationViewModel;
 use Sw\Application\ViewModelInterface;
+use Sw\Util\Annotation\SwViewModelPropertyAnnotation as SwViewModelProperty;
+use Sw\Util\Annotation\SwViewModelAnnotation as SwViewModel;
 
+/**
+ * Class ArticlePaginatedListViewModel
+ * @package Api\Application\ViewModel\Article
+ *
+ * @SwViewModel(
+ *     code=200,
+ *     description="ArticlePaginatedListViewModel description",
+ * )
+ */
 class ArticlePaginatedListViewModel implements ViewModelInterface
 {
-    /** @var ArticleCollection */
+    /**
+     * @var ArticleCollection
+     *
+     * @SwViewModelProperty(
+     *     required=true,
+     *     type="Api\Application\ViewModel\Article\ArticleCollection",
+     * )
+     */
     private $articles = [];
-    /** @var PaginationViewModel */
+
+    /**
+     * @var PaginationViewModel
+     *
+     * @SwViewModelProperty(
+     *     required=true,
+     *     type="Api\Application\ViewModel\PaginationViewModel",
+     * )
+     */
     private $pagination;
 
     /**
